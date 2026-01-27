@@ -4,12 +4,12 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "",
     "build": "tsc",
-    "dev": "nodemon --exec tsx src/index.ts"
+    "dev": "nodemon --exec tsx src/index.ts",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
