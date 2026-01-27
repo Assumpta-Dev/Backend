@@ -3,7 +3,6 @@ import express from "express";
 import morgan from "morgan";
 import multer from "multer";
 import path from "path";
-import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/auth";
 import categoriesRoutes from "./routes/categories";
@@ -20,13 +19,10 @@ dotenv.config();
 const PORT = process.env.PORT || 7000;
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 app.use(morgan("dev"));
 app.use(express.json());
 
-// Routes (paths)
+// Routes
 app.use("/auth", authRoutes);
 app.use("/category", categoriesRoutes);
 app.use("/product", productsRoutes);
@@ -71,17 +67,21 @@ app.get("/", (_req, res) => {
   res.json({ message: "Welcome to the API" });
 });
 
-const startServer = async () => {
-  try {
-    await connectdb();
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error("Server failed to start:", error);
-  }
-};
+// Initialize database connection
+connectdb().catch(console.error);
 
-startServer();
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const startServer = async () => {
+    try {
+      app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+      });
+    } catch (error) {
+      console.error("Server failed to start:", error);
+    }
+  };
+  startServer();
+}
 
 export default app;
