@@ -1,25 +1,25 @@
 import { Request, Response } from "express";
 /**
- * GET ALL USERS (admin use)
+ * GET ALL USERS (Admin only)
  */
-export declare const getAllUsers: (req: Request, res: Response) => Promise<void>;
+export declare const getAllUsers: (_req: Request, res: Response) => Promise<void>;
 /**
- * GET USER BY ID
+ * GET USER BY ID (Admin only)
  */
 export declare const getUserById: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 /**
- * UPDATE USER
+ * UPDATE USER (Admin only)
  */
-export declare const updateUser: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const updateUser: (req: any, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 /**
- * DELETE USER
+ * DELETE USER (Admin only)
  */
-export declare const deleteUser: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const deleteUser: (req: any, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 declare const _default: {
-    getAllUsers: (req: Request, res: Response) => Promise<void>;
+    getAllUsers: (_req: Request, res: Response) => Promise<void>;
     getUserById: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
-    updateUser: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
-    deleteUser: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+    updateUser: (req: any, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+    deleteUser: (req: any, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 };
 export default _default;
 //# sourceMappingURL=users.d.ts.map

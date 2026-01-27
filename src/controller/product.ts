@@ -1,107 +1,159 @@
 import type { Request, Response } from "express";
-import  {ProductModel}  from "../types/product";
+import { ProductModel } from "../model/product";
 
-//GET ALL PRODUCTS 
+/**
+ * GET ALL PRODUCTS (PUBLIC)
+ */
 export const getAllProducts = async (req: Request, res: Response) => {
-  const products = await ProductModel.find();
-
   try {
+    const products = await ProductModel.find()
+      .populate("categoryId", "name")
+      .sort({ createdAt: -1 });
+
     res.status(200).json({
       success: true,
+      count: products.length,
+      data: products,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch products",
+    });
   }
 };
 
-//GET PRODUCT BY ID
+/**
+ * GET PRODUCT BY ID (PUBLIC)
+ */
 export const getProductById = async (req: Request, res: Response) => {
-  const id = req.params.id;
-
   try {
-    const products = await ProductModel.findById(id);
-    if (!products) {
+    const product = await ProductModel.findById(req.params.id).populate(
+      "categoryId",
+      "name",
+    );
+
+    if (!product) {
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
     }
+
     res.status(200).json({
       success: true,
+      data: product,
     });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
+    });
   }
 };
 
-//CREATE PRODUCT
+/**
+ * CREATE PRODUCT (VENDOR)
+ */
 export const createProduct = async (req: Request, res: Response) => {
-  const { name, price, description, categoryId, inStock, quantity } = req.body;
-
   try {
-    const products = await ProductModel.create({
+    const { name, price, description, categoryId, quantity, inStock } =
+      req.body;
+
+    if (!name || !price || !categoryId) {
+      return res.status(400).json({
+        success: false,
+        message: "name, price and categoryId are required",
+      });
+    }
+    // Get uploaded image URLs
+   const images =
+      req.files && Array.isArray(req.files)
+        ? req.files.map((file) => `/uploads/${file.filename}`)
+        : [];
+
+    // Get Cloudinary URLs from uploaded files
+    /**const images =
+      req.files && Array.isArray(req.files)
+        ? req.files.map((file) => (file as any).path) // Cloudinary URL
+        : [];**/
+
+    const product = await ProductModel.create({
       name,
       price,
       description,
       categoryId,
-      inStock,
       quantity,
+      images,
+      inStock: true,
     });
+
     res.status(201).json({
       success: true,
-      message: "Product created successfully",
+      message: "Product created successfully with images",
+      data: product,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to create product",
+    });
   }
 };
 
-//UPDATE PRODUCT 
-
+/**
+ * UPDATE PRODUCT (VENDOR)
+ */
 export const updateProduct = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const { name, price, description, image } = req.body;
-
-    try {
-        const products = await ProductModel.findByIdAndUpdate(id, {
-            name,
-            price,
-            description,
-            image,
-        });
-        if (!products) {
-            return res.status(404).json({
-                success: false,
-                message: "Product not found",
-            });
-        }
-        res.status(200).json({
-            success: true,
-            message: "Product updated successfully",
-        });
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-//DELETE PRODUCT
-
-export const deleteProduct = async (req: Request, res: Response) => {
-  const id = req.params.id;
-
   try {
-    const products = await ProductModel.findByIdAndDelete(id);
-    if (!products) {
+    const product = await ProductModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true },
+    );
+
+    if (!product) {
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
     }
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      data: product,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update product",
+    });
+  }
+};
+
+/**
+ * DELETE PRODUCT (VENDOR)
+ */
+export const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await ProductModel.findByIdAndDelete(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: "Product deleted successfully",
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete product",
+    });
   }
 };

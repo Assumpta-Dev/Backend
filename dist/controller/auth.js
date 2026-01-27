@@ -1,12 +1,60 @@
 import bcrypt from "bcryptjs";
-import { userModel } from "../types/users";
-/**
- * REGISTER USER
- */
+import jwt from "jsonwebtoken";
+import { userModel } from "../model/users";
+import nodemailer from "nodemailer";
+// ---------------------------
+// EMAIL CONFIGURATION
+// ---------------------------
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: Number(process.env.EMAIL_PORT) || 587,
+    secure: false, // true for 465, false for 587
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+    },
+});
+// Optional: verify email transporter on startup
+transporter.verify((error) => {
+    if (error) {
+        console.error(" Email service error:", error);
+    }
+    else {
+        console.log("Email service is ready");
+    }
+});
+// Send welcome email function
+const sendWelcomeEmail = async (email, firstName) => {
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: email,
+        subject: "Welcome to Our Platform 🎉",
+        html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>Hello ${firstName}, 👋</h2>
+        <p>Welcome to our platform!</p>
+        <p>Your account has been created successfully.</p>
+        <p>If you did not create this account, please ignore this email.</p>
+        <br />
+        <p>Best regards,</p>
+        <strong>The Team</strong>
+      </div>
+    `,
+    };
+    await transporter.sendMail(mailOptions);
+};
+// ---------------------------
+// REGISTER USER
+// ---------------------------
 export const registerUser = async (req, res) => {
     const { firstName, lastName, email, password, role } = req.body;
+    if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({
+            status: "error",
+            message: "All fields are required",
+        });
+    }
     try {
-        // check if user already exists
         const existingUser = await userModel.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -14,7 +62,6 @@ export const registerUser = async (req, res) => {
                 message: "User already exists",
             });
         }
-        // hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         const user = await userModel.create({
@@ -22,31 +69,51 @@ export const registerUser = async (req, res) => {
             lastName,
             email,
             password: hashedPassword,
-            role,
+            role: role || "customer",
+        });
+        // Send welcome email asynchronously
+        sendWelcomeEmail(email, firstName).catch((err) => {
+            console.error("Failed to send welcome email:", err);
+            // Do not fail registration if email fails
+        });
+        if (!process.env.JWT_SECRET) {
+            throw new Error("JWT_SECRET is not defined in .env");
+        }
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "7d",
         });
         res.status(201).json({
             status: "success",
-            message: "User registered successfully",
+            message: "User registered successfully. Check your email!",
+            token,
             data: {
                 id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
                 role: user.role,
             },
         });
     }
     catch (error) {
-        console.error(error);
+        console.error("Register error:", error);
         res.status(500).json({
             status: "error",
-            message: "User registration failed",
+            message: error.message || "User registration failed",
         });
     }
 };
-/**
- * LOGIN USER
- */
+// ---------------------------
+// LOGIN USER
+// ---------------------------
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({
+            status: "error",
+            message: "Email and password are required",
+        });
+    }
     try {
         const user = await userModel.findOne({ email }).select("+password");
         if (!user) {
@@ -62,50 +129,103 @@ export const loginUser = async (req, res) => {
                 message: "Invalid email or password",
             });
         }
+        if (!process.env.JWT_SECRET) {
+            throw new Error("JWT_SECRET is not defined in .env");
+        }
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "7d",
+        });
         res.status(200).json({
             status: "success",
             message: "Login successful",
+            token,
             data: {
                 id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
                 role: user.role,
             },
         });
     }
     catch (error) {
-        console.error(error);
+        console.error("Login error:", error);
         res.status(500).json({
             status: "error",
-            message: "Login failed",
+            message: error.message || "Login failed",
         });
     }
 };
-/**
- * GET USER PROFILE
- */
+// ---------------------------
+// GET USER PROFILE
+// ---------------------------
 export const getUserProfile = async (req, res) => {
     try {
-        // later this will come from auth middleware (req.user.id)
-        const userId = req.params.id;
-        const user = await userModel.findById(userId).select("-password");
+        const user = req.user; // from protect middleware
+        if (!user) {
+            return res.status(401).json({
+                status: "error",
+                message: "Unauthorized",
+            });
+        }
+        res.status(200).json({
+            status: "success",
+            data: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role,
+            },
+        });
+    }
+    catch (error) {
+        console.error("Get profile error:", error);
+        res.status(500).json({
+            status: "error",
+            message: error.message || "Failed to get profile",
+        });
+    }
+};
+// ---------------------------
+// RESET PASSWORD
+// ---------------------------
+export const resetPassword = async (req, res) => {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+        return res.status(400).json({
+            status: "error",
+            message: "Email and new password are required",
+        });
+    }
+    try {
+        const user = await userModel.findOne({ email }).select("+password");
         if (!user) {
             return res.status(404).json({
                 status: "error",
                 message: "User not found",
             });
         }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        user.password = hashedPassword;
+        await user.save();
         res.status(200).json({
             status: "success",
-            data: user,
+            message: "Password reset successfully",
         });
     }
     catch (error) {
-        console.error(error);
+        console.error("Reset password error:", error);
         res.status(500).json({
             status: "error",
-            message: "Failed to get profile",
+            message: error.message || "Failed to reset password",
         });
     }
 };
-export default { loginUser, registerUser, getUserProfile };
+export default {
+    registerUser,
+    loginUser,
+    getUserProfile,
+    resetPassword,
+};
 //# sourceMappingURL=auth.js.map

@@ -4,7 +4,7 @@ export interface Users extends Document {
     lastName: string;
     email: string;
     password: string;
-    role: "user" | "admin";
+    role: "user" | "admin" | "vendor";
     createdAt: Date;
     isActive: boolean;
     comparePassword(candidatePassword: string): Promise<boolean>;

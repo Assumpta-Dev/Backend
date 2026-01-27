@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import {CategoryModel} from "../types/category";
+import { CategoryModel } from "../model/category";
 
 // GET ALL CATEGORIES
 export const getAllCategories = async (req: Request, res: Response) => {
@@ -60,7 +60,7 @@ export const createCategory = async (req: Request, res: Response) => {
 // UPDATE CATEGORY
 export const updateCategory = async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { name, description } = req.body;
+  const { name, description } = req.body || {};
 
   try {
     const category = await CategoryModel.findByIdAndUpdate(id, {

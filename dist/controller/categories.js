@@ -1,4 +1,4 @@
-import { CategoryModel } from "../types/category";
+import { CategoryModel } from "../model/category";
 // GET ALL CATEGORIES
 export const getAllCategories = async (req, res) => {
     try {
@@ -52,7 +52,7 @@ export const createCategory = async (req, res) => {
 // UPDATE CATEGORY
 export const updateCategory = async (req, res) => {
     const id = req.params.id;
-    const { name, description } = req.body;
+    const { name, description } = req.body || {};
     try {
         const category = await CategoryModel.findByIdAndUpdate(id, {
             name,

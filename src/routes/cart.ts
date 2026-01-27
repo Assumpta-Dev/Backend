@@ -1,61 +1,171 @@
-import { Router } from "express";
-import { v4 as uuid } from "uuid";
-import type { Cart } from "../types/cart";
+import express from "express";
+import {
+  getCart,
+  addToCart,
+  updateCartItem,
+  removeCartItem,
+  clearCart,
+} from "../controller/cart";
+import { protect, authorize } from "../middleware/auth.middleware";
 
-const router = Router();
-const carts: Cart[] = [];
+const router = express.Router();
 
-// GET cart
-router.get("/:userId", (req, res) => {
-  const cart = carts.find((c) => c.userId === req.params.userId);
-  res.json(cart ?? { userId: req.params.userId, items: [] });
-});
+/**
+ * @swagger
+ * /cart:
+ *   get:
+ *     summary: Get customer cart
+ *     description: Retrieve the current cart for the logged-in customer.
+ *     tags:
+ *       - Cart
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cart retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 totalAmount:
+ *                   type: number
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Access denied (customers only)
+ */
+router.get("/", protect, authorize("customer"), getCart);
 
-// ADD item
-router.post("/:userId/items", (req, res) => {
-  let cart = carts.find((c) => c.userId === req.params.userId);
+/**
+ * @swagger
+ * /cart:
+ *   post:
+ *     summary: Add item to cart
+ *     description: Add a product to the customer cart or increase quantity if it already exists.
+ *     tags:
+ *       - Cart
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productId
+ *               - quantity
+ *             properties:
+ *               productId:
+ *                 type: string
+ *                 example: 64fdc9e4b9f1a2c123456789
+ *               quantity:
+ *                 type: number
+ *                 example: 2
+ *     responses:
+ *       201:
+ *         description: Item added to cart successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Access denied (customers only)
+ */
+router.post("/", protect, authorize("customer"), addToCart);
 
-  if (!cart) {
-    cart = { userId: req.params.userId, items: [] };
-    carts.push(cart);
-  }
+/**
+ * @swagger
+ * /cart/{id}:
+ *   put:
+ *     summary: Update cart item quantity
+ *     description: Update the quantity of a specific item in the cart.
+ *     tags:
+ *       - Cart
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Cart item ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - quantity
+ *             properties:
+ *               quantity:
+ *                 type: number
+ *                 example: 3
+ *     responses:
+ *       200:
+ *         description: Cart item updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Access denied (customers only)
+ *       404:
+ *         description: Cart item not found
+ */
+router.put("/:id", protect, authorize("customer"), updateCartItem);
 
-  const item = {
-    id: uuid(),
-    productId: req.body.productId,
-    quantity: req.body.quantity,
-  };
+/**
+ * @swagger
+ * /cart/{id}:
+ *   delete:
+ *     summary: Remove item from cart
+ *     description: Remove a specific item from the customer cart.
+ *     tags:
+ *       - Cart
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Cart item ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Item removed from cart successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Access denied (customers only)
+ *       404:
+ *         description: Cart item not found
+ */
+router.delete("/:id", protect, authorize("customer"), removeCartItem);
 
-  cart.items.push(item);
-  res.status(201).json(item);
-});
+/**
+ * @swagger
+ * /cart:
+ *   delete:
+ *     summary: Clear cart
+ *     description: Remove all items from the customer cart.
+ *     tags:
+ *       - Cart
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cart cleared successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Access denied (customers only)
+ */
+router.delete("/", protect, authorize("customer"), clearCart);
 
-// UPDATE item
-router.put("/:userId/items/:id", (req, res) => {
-  const cart = carts.find((c) => c.userId === req.params.userId);
-  if (!cart) return res.status(404).json({ message: "Cart not found" });
-
-  const item = cart.items.find((i) => i.id === req.params.id);
-  if (!item) return res.status(404).json({ message: "Item not found" });
-
-  item.quantity = req.body.quantity;
-  res.json(item);
-});
-
-// DELETE item
-router.delete("/:userId/items/:id", (req, res) => {
-  const cart = carts.find((c) => c.userId === req.params.userId);
-  if (!cart) return res.status(404).json({ message: "Cart not found" });
-
-  cart.items = cart.items.filter((i) => i.id !== req.params.id);
-  res.status(204).send();
-});
-
-// CLEAR cart
-router.delete("/:userId", (req, res) => {
-  const index = carts.findIndex((c) => c.userId === req.params.userId);
-  if (index !== -1) carts.splice(index, 1);
-  res.status(204).send();
-});
 
 export default router;
