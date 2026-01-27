@@ -26,7 +26,7 @@ const __dirname = path.dirname(__filename);
 app.use(morgan("dev"));
 app.use(express.json());
 
-// Routes
+// Routes (paths)
 app.use("/auth", authRoutes);
 app.use("/category", categoriesRoutes);
 app.use("/product", productsRoutes);
