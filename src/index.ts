@@ -3,6 +3,8 @@ import express from "express";
 import morgan from "morgan";
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
+import cors from "cors";
 
 import authRoutes from "./routes/auth";
 import categoriesRoutes from "./routes/categories";
@@ -16,11 +18,15 @@ import connectdb from "./database.connect";
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const PORT = process.env.PORT || 7000;
 const app = express();
 
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cors()); // This allows the frontend to talk to this backend
 
 // Routes
 app.use("/auth", authRoutes);
@@ -84,4 +90,4 @@ if (process.env.NODE_ENV !== 'production') {
   startServer();
 }
 
-module.exports = app;
+export default app;
