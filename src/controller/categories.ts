@@ -51,9 +51,19 @@ export const createCategory = async (req: Request, res: Response) => {
     console.log('Request file:', req.file);
     console.log('Content-Type:', req.headers['content-type']);
     
-    // Handle multipart form data
-    const name = req.body?.name || req.body?.categoryName || '';
-    const description = req.body?.description || '';
+    // Handle both JSON and multipart form data
+    let name, description;
+    
+    if (req.headers['content-type']?.includes('multipart/form-data')) {
+      // Handle multipart form data
+      name = req.body?.name || '';
+      description = req.body?.description || '';
+    } else {
+      // Handle JSON data
+      const { name: jsonName, description: jsonDescription } = req.body || {};
+      name = jsonName || '';
+      description = jsonDescription || '';
+    }
 
     if (!name || name.trim() === '') {
       return res.status(400).json({
@@ -67,7 +77,7 @@ export const createCategory = async (req: Request, res: Response) => {
 
     const category = await CategoryModel.create({
       name: name.trim(),
-      description: description.trim(),
+      description: description?.trim() || '',
       image,
     });
 
