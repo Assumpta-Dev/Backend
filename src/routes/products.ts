@@ -87,7 +87,7 @@ router.get("/:id", getProductById);
  *       201:
  *         description: Product created successfully
  */
-router.post("/", protect, authorize("vendor"),upload.single("image"), createProduct);
+router.post("/", protect, authorize("vendor"), upload.array("images", 5), createProduct);
 
 /**
  * @swagger

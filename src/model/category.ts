@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface Category extends Document {
   id: string;
   name: string;
+  image: string; // Add this field
   description?: string;
 }
 
@@ -11,9 +12,14 @@ const categorySchema = new Schema<Category>({
     type: String,
     required: true,
   },
-  description: {
+  image: {
+    // Add this field
     type: String,
     required: true,
+  },
+  description: {
+    type: String,
+    required: false, // Make optional
   },
 });
 

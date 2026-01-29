@@ -7,6 +7,7 @@ import {
   deleteCategory,
 } from "../controller/categories";
 import { protect, authorize } from "../middleware/auth.middleware";
+import { upload } from "../config/multer.config";
 
 const router = express.Router();
 /**
@@ -71,10 +72,18 @@ router.get("/:id", getCategoryById);
 // ADMIN can create category
 router.post(
   "/",
-  protect,
-  authorize("admin"),
+  upload.single("image"),
   createCategory
 );
+
+// Protected route for admin (uncomment when authentication is working)
+// router.post(
+//   "/admin",
+//   protect,
+//   authorize("admin"),
+//   upload.single("image"),
+//   createCategory
+// );
 /**
  * @swagger
  * /category/{id}:
@@ -113,7 +122,7 @@ router.post(
  *       404:
  *         description: Category not found
  */
-router.put("/:id", updateCategory);
+router.put("/:id", protect, authorize("admin"), upload.single("image"), updateCategory);
 
 /**
  * @swagger

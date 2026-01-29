@@ -26,6 +26,7 @@ const app = express();
 
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // This allows the frontend to talk to this backend
 
 // Routes

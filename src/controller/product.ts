@@ -57,8 +57,13 @@ export const getProductById = async (req: Request, res: Response) => {
  */
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { name, price, description, categoryId, quantity, inStock } =
-      req.body;
+    // Handle case where req.body might be undefined
+    const name = req.body?.name || '';
+    const price = req.body?.price || 0;
+    const description = req.body?.description || '';
+    const categoryId = req.body?.categoryId || '';
+    const quantity = req.body?.quantity || 0;
+    const inStock = req.body?.inStock !== undefined ? req.body.inStock : true;
 
     if (!name || !price || !categoryId) {
       return res.status(400).json({
@@ -72,12 +77,6 @@ export const createProduct = async (req: Request, res: Response) => {
         ? req.files.map((file) => `/uploads/${file.filename}`)
         : [];
 
-    // Get Cloudinary URLs from uploaded files
-    /**const images =
-      req.files && Array.isArray(req.files)
-        ? req.files.map((file) => (file as any).path) // Cloudinary URL
-        : [];**/
-
     const product = await ProductModel.create({
       name,
       price,
@@ -85,7 +84,7 @@ export const createProduct = async (req: Request, res: Response) => {
       categoryId,
       quantity,
       images,
-      inStock: true,
+      inStock,
     });
 
     res.status(201).json({
