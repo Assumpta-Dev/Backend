@@ -30,12 +30,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // This allows the frontend to talk to this backend
 
 // Routes
-app.use("/auth", authRoutes);
-app.use("/category", categoriesRoutes);
-app.use("/product", productsRoutes);
-app.use("/users", usersRouter);
-app.use("/orders", orderRouter);
-app.use("/cart", cartsRouter);
+app.use("/api/auth", authRoutes);
+app.use("/api/category", categoriesRoutes);
+app.use("/api/product", productsRoutes);
+app.use("/api/users", usersRouter);
+app.use("/api/orders", orderRouter);
+app.use("/api/cart", cartsRouter);
 app.use("/api/uploads", uploadRoutes);
 
 // Swagger

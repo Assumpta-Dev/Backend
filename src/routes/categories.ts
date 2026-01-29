@@ -72,18 +72,11 @@ router.get("/:id", getCategoryById);
 // ADMIN can create category
 router.post(
   "/",
+  protect,
+  authorize("admin"),
   upload.single("image"),
   createCategory
 );
-
-// Protected route for admin (uncomment when authentication is working)
-// router.post(
-//   "/admin",
-//   protect,
-//   authorize("admin"),
-//   upload.single("image"),
-//   createCategory
-// );
 /**
  * @swagger
  * /category/{id}:
