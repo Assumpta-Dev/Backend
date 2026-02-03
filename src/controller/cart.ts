@@ -40,6 +40,10 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 
   await cart.save();
+  
+  // Populate product data before returning
+  await cart.populate("items.productId");
+  
   res.status(201).json(cart);
 };
 
@@ -48,7 +52,8 @@ export const addToCart = async (req: Request, res: Response) => {
  */
 export const updateCartItem = async (req: Request, res: Response) => {
   const userId = req.user!._id;
-  const { productId, quantity } = req.body;
+  const productId = req.params.id;
+  const { quantity } = req.body;
 
   const cart = await CartModel.findOne({ userId });
   if (!cart) {
@@ -65,6 +70,9 @@ export const updateCartItem = async (req: Request, res: Response) => {
 
   item.quantity = quantity;
   await cart.save();
+  
+  // Populate product data before returning
+  await cart.populate("items.productId");
 
   res.json(cart);
 };
@@ -74,7 +82,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
  */
 export const removeCartItem = async (req: Request, res: Response) => {
   const userId = req.user!._id;
-  const productId = req.params.productId;
+  const productId = req.params.id;
 
   const cart = await CartModel.findOne({ userId });
   if (!cart) {
@@ -86,7 +94,11 @@ export const removeCartItem = async (req: Request, res: Response) => {
   );
 
   await cart.save();
-  res.status(204).send();
+  
+  // Populate product data before returning
+  await cart.populate("items.productId");
+
+  res.json(cart);
 };
 
 /**

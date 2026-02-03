@@ -82,6 +82,7 @@ export const createProduct = async (req: Request, res: Response) => {
       price,
       description,
       categoryId,
+      vendorId: req.user?._id?.toString(), // Convert ObjectId to string
       quantity,
       images,
       inStock,

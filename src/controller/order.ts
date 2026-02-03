@@ -13,6 +13,7 @@ export const createOrder = async (req: Request, res: Response) => {
       });
     }
     const userId = req.user._id;
+    const { billingDetails } = req.body;
 
     // 1. Get user cart
     const cart = await CartModel.findOne({ userId }).populate(
@@ -26,18 +27,20 @@ export const createOrder = async (req: Request, res: Response) => {
       });
     }
 
-    // 2. Calculate total amount
+    // 2. Calculate total amount and create order items
     let totalAmount = 0;
 
     const orderItems = cart.items.map((item: any) => {
       const product = item.productId;
-
-      totalAmount += product.price * item.quantity;
+      const subtotal = product.price * item.quantity;
+      totalAmount += subtotal;
 
       return {
         product: product._id,
-        quantity: item.quantity,
+        name: product.name,
         price: product.price,
+        quantity: item.quantity,
+        subtotal: subtotal,
       };
     });
 
@@ -51,11 +54,14 @@ export const createOrder = async (req: Request, res: Response) => {
     });
 
     // 4. Clear cart
-    cart.items = [];
-    await cart.save();
+    await CartModel.findOneAndUpdate(
+      { userId },
+      { items: [] }
+    );
 
     res.status(201).json({
       status: "success",
+      message: "Order placed successfully",
       data: order,
     });
   } catch (error) {

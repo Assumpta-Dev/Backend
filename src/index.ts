@@ -13,6 +13,7 @@ import usersRouter from "./routes/users";
 import orderRouter from "./routes/order";
 import cartsRouter from "./routes/cart";
 import uploadRoutes from "./routes/upload";
+import statsRoutes from "./routes/stats";
 import swagger from "./config/swagger";
 import connectdb from "./database.connect";
 
@@ -37,6 +38,7 @@ app.use("/users", usersRouter);
 app.use("/orders", orderRouter);
 app.use("/cart", cartsRouter);
 app.use("/api/uploads", uploadRoutes);
+app.use("/stats", statsRoutes);
 
 // Swagger
 app.use("/api-docs", swagger);

@@ -23,7 +23,7 @@ const router = express.Router();
  *       400:
  *         description: Cart is empty
  */
-router.post("/", protect, createOrder);
+router.post("/", protect, authorize("customer"), createOrder);
 
 /**
  * @swagger

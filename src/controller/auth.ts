@@ -52,7 +52,11 @@ const sendWelcomeEmail = async (email: string, firstName: string) => {
 // REGISTER USER
 // ---------------------------
 export const registerUser = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password, role } = req.body;
+  const firstName = req.body?.firstName;
+  const lastName = req.body?.lastName;
+  const email = req.body?.email;
+  const password = req.body?.password;
+  const role = req.body?.role;
 
   if (!firstName || !lastName || !email || !password) {
     return res.status(400).json({
@@ -120,7 +124,8 @@ export const registerUser = async (req: Request, res: Response) => {
 // LOGIN USER
 // ---------------------------
 export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const email = req.body?.email;
+  const password = req.body?.password;
 
   if (!email || !password) {
     return res.status(400).json({
@@ -211,7 +216,8 @@ export const getUserProfile = async (req: any, res: Response) => {
 // RESET PASSWORD
 // ---------------------------
 export const resetPassword = async (req: Request, res: Response) => {
-  const { email, newPassword } = req.body;
+  const email = req.body?.email;
+  const newPassword = req.body?.newPassword;
 
   if (!email || !newPassword) {
     return res.status(400).json({

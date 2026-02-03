@@ -6,6 +6,7 @@ export interface Product extends Document {
   price: number;
   description?: string;
   categoryId: string;
+  vendorId?: string;
   inStock: boolean;
   quantity: number;
   images: string[]; // Array of image URLs
@@ -28,6 +29,10 @@ const productSchema = new Schema<Product>({
   categoryId: {
     type: String,
     required: [true, "Category ID is required"],
+  },
+  vendorId: {
+    type: String,
+    required: false,
   },
   inStock: {
     type: Boolean,
