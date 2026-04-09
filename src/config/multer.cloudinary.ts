@@ -1,14 +1,6 @@
 // src/config/multer-cloudinary.config.ts
 import multer from "multer";
 import cloudinary from "./cloudinary.js";
-
-// Type declaration for multer-storage-cloudinary
-declare module "multer-storage-cloudinary" {
-  export class CloudinaryStorage {
-    constructor(options: any);
-  }
-}
-
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const storage = new CloudinaryStorage({
