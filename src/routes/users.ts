@@ -4,8 +4,8 @@ import {
   getUserById,
   updateUser,
   deleteUser,
-} from "../controller/users";
-import { protect, authorize } from "../middleware/auth.middleware";
+} from "../controller/users.js";
+import { protect, authorize } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 

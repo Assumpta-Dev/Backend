@@ -5,9 +5,9 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-} from "../controller/product";
-import { protect, authorize } from "../middleware/auth.middleware";
-import { upload } from "../config/multer.config";
+} from "../controller/product.js";
+import { protect, authorize } from "../middleware/auth.middleware.js";
+import { upload } from "../config/multer.config.js";
 
 const router = express.Router();
 

@@ -1,11 +1,11 @@
 // src/services/email.service.ts
-import { transporter } from "../config/email.config";
+import { transporter } from "../config/email.config.js";
 import {
   welcomeEmailTemplate,
   passwordResetTemplate,
   paymentConfirmationTemplate,
   orderCancellationTemplate,
-} from "../template/email.template";
+} from "../template/email.template.js";
 
 interface EmailOptions {
   to: string;

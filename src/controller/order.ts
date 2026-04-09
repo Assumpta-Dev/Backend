@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { OrderModel } from "../model/order";
-import { CartModel } from "../model/cart";
-import { ProductModel } from "../model/product";
+import { OrderModel } from "../model/order.js";
+import { CartModel } from "../model/cart.js";
+import { ProductModel } from "../model/product.js";
 import nodemailer from "nodemailer";
 
 // Email transporter

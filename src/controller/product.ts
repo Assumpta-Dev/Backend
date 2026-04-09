@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { ProductModel } from "../model/product";
+import { ProductModel } from "../model/product.js";
 
 /**
  * GET ALL PRODUCTS (PUBLIC)

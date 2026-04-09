@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { userModel } from "../model/users";
+import { userModel } from "../model/users.js";
 
 /**
  * GET ALL USERS (Admin only)

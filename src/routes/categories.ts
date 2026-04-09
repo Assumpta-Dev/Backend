@@ -5,9 +5,9 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
-} from "../controller/categories";
-import { protect, authorize } from "../middleware/auth.middleware";
-import { upload } from "../config/multer.config";
+} from "../controller/categories.js";
+import { protect, authorize } from "../middleware/auth.middleware.js";
+import { upload } from "../config/multer.config.js";
 
 const router = express.Router();
 /**

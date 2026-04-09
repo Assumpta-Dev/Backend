@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CartModel } from "../model/cart";
+import { CartModel } from "../model/cart.js";
 
 /**
  * GET CART

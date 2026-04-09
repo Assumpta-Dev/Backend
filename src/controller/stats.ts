@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { ProductModel } from "../model/product";
-import { CategoryModel } from "../model/category";
-import { userModel } from "../model/users";
-import { OrderModel } from "../model/order";
+import { ProductModel } from "../model/product.js";
+import { CategoryModel } from "../model/category.js";
+import { userModel } from "../model/users.js";
+import { OrderModel } from "../model/order.js";
 
 export const getStats = async (req: Request, res: Response) => {
   try {
