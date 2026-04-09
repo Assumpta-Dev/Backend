@@ -4,6 +4,7 @@ import {
   getMyOrders,
   getAllOrders,
   updateOrderStatus,
+  deleteOrder,
 } from "../controller/order";
 import { protect, authorize } from "../middleware/auth.middleware";
 
@@ -75,6 +76,23 @@ router.get("/", protect, authorize("admin"), getAllOrders);
  *                 type: string
  *                 enum: [pending, paid, failed, refunded]
  */
-router.put("/:id/status", protect, authorize("admin"), updateOrderStatus);
+router.put("/:id/status", protect, updateOrderStatus);
+
+/**
+ * @swagger
+ * /orders/{id}:
+ *   delete:
+ *     summary: Delete order (Customer can delete cancelled orders)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ */
+router.delete("/:id", protect, deleteOrder);
 
 export default router;

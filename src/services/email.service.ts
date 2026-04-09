@@ -3,7 +3,8 @@ import { transporter } from "../config/email.config";
 import {
   welcomeEmailTemplate,
   passwordResetTemplate,
-  orderConfirmationTemplate,
+  paymentConfirmationTemplate,
+  orderCancellationTemplate,
 } from "../template/email.template";
 
 interface EmailOptions {
@@ -61,6 +62,31 @@ export const sendOrderConfirmationEmail = async (
   await sendEmail({
     to: email,
     subject: `Order Confirmation - ${orderId}`,
-    html: orderConfirmationTemplate(firstName, orderId, total),
+    html: paymentConfirmationTemplate(firstName, orderId, total),
+  });
+};
+
+export const sendPaymentConfirmationEmail = async (
+  email: string,
+  firstName: string,
+  orderId: string,
+  total: number,
+): Promise<void> => {
+  await sendEmail({
+    to: email,
+    subject: `Payment Confirmed - ${orderId}`,
+    html: paymentConfirmationTemplate(firstName, orderId, total),
+  });
+};
+
+export const sendOrderCancellationEmail = async (
+  email: string,
+  firstName: string,
+  orderId: string,
+): Promise<void> => {
+  await sendEmail({
+    to: email,
+    subject: `Order Cancelled - ${orderId}`,
+    html: orderCancellationTemplate(firstName, orderId),
   });
 };

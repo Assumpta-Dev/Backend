@@ -14,6 +14,17 @@ export interface Order extends Document {
   totalAmount: number;
   orderStatus: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
   paymentStatus: "pending" | "paid" | "failed" | "refunded";
+  billingDetails: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,6 +69,17 @@ const orderSchema = new Schema<Order>(
       type: String,
       enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
+    },
+    billingDetails: {
+      firstName: { type: String, required: true },
+      lastName: { type: String, required: true },
+      email: { type: String, required: true },
+      phone: { type: String, required: true },
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String },
+      zipCode: { type: String, required: true },
+      country: { type: String, default: 'United States (US)' },
     },
   },
   { timestamps: true },

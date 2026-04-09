@@ -4,49 +4,16 @@ import jwt from "jsonwebtoken";
 import { userModel } from "../model/users";
 import nodemailer from "nodemailer";
 
-// ---------------------------
-// EMAIL CONFIGURATION
-// ---------------------------
+// Email transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: Number(process.env.EMAIL_PORT) || 587,
-  secure: false, // true for 465, false for 587
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
-
-// Optional: verify email transporter on startup
-transporter.verify((error) => {
-  if (error) {
-    console.error(" Email service error:", error);
-  } else {
-    console.log("Email service is ready");
+    pass: process.env.EMAIL_PASSWORD
   }
 });
-
-// Send welcome email function
-const sendWelcomeEmail = async (email: string, firstName: string) => {
-  const mailOptions = {
-    from: process.env.EMAIL_FROM,
-    to: email,
-    subject: "Welcome to Our Platform 🎉",
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <h2>Hello ${firstName}, 👋</h2>
-        <p>Welcome to our platform!</p>
-        <p>Your account has been created successfully.</p>
-        <p>If you did not create this account, please ignore this email.</p>
-        <br />
-        <p>Best regards,</p>
-        <strong>The Team</strong>
-      </div>
-    `,
-  };
-
-  await transporter.sendMail(mailOptions);
-};
 
 // ---------------------------
 // REGISTER USER
@@ -85,11 +52,30 @@ export const registerUser = async (req: Request, res: Response) => {
       role: role || "customer",
     });
 
-    // Send welcome email asynchronously
-    sendWelcomeEmail(email, firstName).catch((err) => {
-      console.error("Failed to send welcome email:", err);
-      // Do not fail registration if email fails
-    });
+    // Send welcome email
+    transporter.sendMail({
+      to: email,
+      subject: 'Welcome to Kapee! 🎉',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: #3B82F6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1>Welcome to Kapee! 🎉</h1>
+          </div>
+          <div style="background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px;">
+            <h2>Hello ${firstName}!</h2>
+            <p>Thank you for joining Kapee. We're excited to have you on board.</p>
+            <p>Your account has been successfully created with the email: <strong>${email}</strong></p>
+            <p>You can now start exploring our platform and enjoy shopping!</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="http://localhost:5173" style="background: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">Start Shopping</a>
+            </div>
+          </div>
+          <div style="text-align: center; padding: 20px; color: #777; font-size: 12px;">
+            <p>© 2024 Kapee. All rights reserved.</p>
+          </div>
+        </div>
+      `
+    }).catch(err => console.log('Welcome email failed:', err));
 
     if (!process.env.JWT_SECRET) {
       throw new Error("JWT_SECRET is not defined in .env");
@@ -101,7 +87,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
     res.status(201).json({
       status: "success",
-      message: "User registered successfully. Check your email!",
+      message: "Account created successfully! Welcome email sent.",
       token,
       data: {
         id: user._id,

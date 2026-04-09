@@ -8,12 +8,12 @@ export const welcomeEmailTemplate = (firstName: string, email: string) => {
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #4CAF50; color: white; padding: 20px; text-align: center; }
+        .header { background: #3B82F6; color: white; padding: 20px; text-align: center; }
         .content { padding: 20px; background: #f9f9f9; }
         .button { 
           display: inline-block; 
           padding: 10px 20px; 
-          background: #4CAF50; 
+          background: #3B82F6; 
           color: white; 
           text-decoration: none; 
           border-radius: 5px; 
@@ -25,17 +25,23 @@ export const welcomeEmailTemplate = (firstName: string, email: string) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>Welcome to Our Platform!</h1>
+          <h1>Welcome to Kapee! 🎉</h1>
         </div>
         <div class="content">
           <h2>Hello ${firstName}!</h2>
-          <p>Thank you for registering with us. We're excited to have you on board.</p>
+          <p>Thank you for joining Kapee. We're excited to have you on board.</p>
           <p>Your account has been successfully created with the email: <strong>${email}</strong></p>
-          <p>You can now start exploring our platform and enjoy all the features we offer.</p>
-          <a href="https://yourapp.com/login" class="button">Get Started</a>
+          <p>You can now start exploring our platform and enjoy all the features we offer:</p>
+          <ul>
+            <li>Browse thousands of products</li>
+            <li>Track your orders</li>
+            <li>Manage your account</li>
+            <li>Get exclusive deals</li>
+          </ul>
+          <a href="http://localhost:5173" class="button">Start Shopping</a>
         </div>
         <div class="footer">
-          <p>© 2024 Your Company. All rights reserved.</p>
+          <p>© 2024 Kapee. All rights reserved.</p>
           <p>If you didn't create this account, please ignore this email.</p>
         </div>
       </div>
@@ -97,7 +103,7 @@ export const passwordResetTemplate = (
   `;
 };
 
-export const orderConfirmationTemplate = (
+export const paymentConfirmationTemplate = (
   firstName: string,
   orderId: string,
   total: number,
@@ -109,7 +115,7 @@ export const orderConfirmationTemplate = (
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #2196F3; color: white; padding: 20px; text-align: center; }
+        .header { background: #4CAF50; color: white; padding: 20px; text-align: center; }
         .content { padding: 20px; background: #f9f9f9; }
         .order-details { background: white; padding: 15px; margin: 20px 0; border-radius: 5px; }
         .footer { text-align: center; padding: 20px; color: #777; font-size: 12px; }
@@ -118,21 +124,64 @@ export const orderConfirmationTemplate = (
     <body>
       <div class="container">
         <div class="header">
-          <h1>Order Confirmed!</h1>
+          <h1>Payment Confirmed! ✅</h1>
         </div>
         <div class="content">
           <h2>Thank you, ${firstName}!</h2>
-          <p>Your order has been successfully placed and is being processed.</p>
+          <p>Your payment has been successfully processed.</p>
           <div class="order-details">
-            <h3>Order Details:</h3>
+            <h3>Payment Details:</h3>
             <p><strong>Order ID:</strong> ${orderId}</p>
-            <p><strong>Total Amount:</strong> $${total.toFixed(2)}</p>
-            <p><strong>Status:</strong> Processing</p>
+            <p><strong>Amount Paid:</strong> $${total.toFixed(2)}</p>
+            <p><strong>Payment Status:</strong> Confirmed</p>
           </div>
-          <p>We'll send you another email when your order ships.</p>
+          <p>Your order is now being prepared for shipment.</p>
         </div>
         <div class="footer">
-          <p>© 2024 Your Company. All rights reserved.</p>
+          <p>© 2024 Kapee. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+export const orderCancellationTemplate = (
+  firstName: string,
+  orderId: string,
+) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #f44336; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .order-details { background: white; padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .footer { text-align: center; padding: 20px; color: #777; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Order Cancelled</h1>
+        </div>
+        <div class="content">
+          <h2>Hello ${firstName},</h2>
+          <p>Your order has been successfully cancelled as requested.</p>
+          <div class="order-details">
+            <h3>Cancellation Details:</h3>
+            <p><strong>Order ID:</strong> ${orderId}</p>
+            <p><strong>Status:</strong> Cancelled</p>
+            <p><strong>Cancelled On:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
+          <p>If any payment was made, the refund will be processed within 3-5 business days.</p>
+          <p>If you have any questions, please contact our support team.</p>
+        </div>
+        <div class="footer">
+          <p>© 2024 Kapee. All rights reserved.</p>
         </div>
       </div>
     </body>

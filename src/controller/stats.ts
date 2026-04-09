@@ -29,10 +29,13 @@ export const getStats = async (req: Request, res: Response) => {
       });
     } else if (user.role === 'vendor') {
       // Vendor sees only their products and general categories
+      const vendorIdString = user._id.toString();
+      const vendorProductIds = await ProductModel.find({ vendorId: vendorIdString }).distinct('_id');
+      
       const [vendorProducts, totalCategories, vendorOrders] = await Promise.all([
-        ProductModel.countDocuments({ vendorId: user._id }),
+        ProductModel.countDocuments({ vendorId: vendorIdString }),
         CategoryModel.countDocuments(),
-        OrderModel.countDocuments({ 'items.product': { $in: await ProductModel.find({ vendorId: user._id }).distinct('_id') } })
+        OrderModel.countDocuments({ 'items.product': { $in: vendorProductIds } })
       ]);
 
       res.json({
