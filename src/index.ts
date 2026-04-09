@@ -28,7 +28,16 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors()); // This allows the frontend to talk to this backend
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000', 
+    'https://your-frontend-domain.com' // Replace with your actual frontend domain
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Routes
 app.use("/auth", authRoutes);
@@ -79,18 +88,27 @@ app.get("/", (_req, res) => {
 // Initialize database connection
 connectdb().catch(console.error);
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  const startServer = async () => {
-    try {
-      app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
+// Start server
+const startServer = async () => {
+  try {
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+    
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, shutting down gracefully');
+      server.close(() => {
+        console.log('Process terminated');
       });
-    } catch (error) {
-      console.error("Server failed to start:", error);
-    }
-  };
-  startServer();
-}
+    });
+  } catch (error) {
+    console.error("Server failed to start:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export default app;
