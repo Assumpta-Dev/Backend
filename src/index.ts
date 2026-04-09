@@ -6,16 +6,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 
-import authRoutes from "./routes/auth";
-import categoriesRoutes from "./routes/categories";
-import productsRoutes from "./routes/products";
-import usersRouter from "./routes/users";
-import orderRouter from "./routes/order";
-import cartsRouter from "./routes/cart";
-import uploadRoutes from "./routes/upload";
-import statsRoutes from "./routes/stats";
-import swagger from "./config/swagger";
-import connectdb from "./database.connect";
+import authRoutes from "./routes/auth.js";
+import categoriesRoutes from "./routes/categories.js";
+import productsRoutes from "./routes/products.js";
+import usersRouter from "./routes/users.js";
+import orderRouter from "./routes/order.js";
+import cartsRouter from "./routes/cart.js";
+import uploadRoutes from "./routes/upload.js";
+import statsRoutes from "./routes/stats.js";
+import swagger from "./config/swagger.js";
+import connectdb from "./database.connect.js";
 
 dotenv.config();
 
